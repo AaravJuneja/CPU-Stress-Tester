@@ -7,9 +7,9 @@ def cpu_intensive_task(duration, process_id):
     start_time = time.time()
     while time.time() - start_time < duration:
         # Simulate CPU-intensive workload
+        result = 0
         for _ in range(10000):
             for _ in range(10000):
-                result = 0
                 for i in range(10000):
                     result += i * i
         time.sleep(0.1)  # Sleep for a short period to avoid excessive CPU usage
@@ -27,7 +27,7 @@ def run_cpu_stress_test(num_threads, duration):
         processes.append(p)
 
     start_time = time.time()
-    while time.time() - start_time < duration:
+    while any(p.is_alive() for p in processes):
         completed_processes = sum(not p.is_alive() for p in processes)
         progress = (completed_processes / num_threads) * 100
         print(f"  {progress:.2f}% complete  |  {completed_processes}/{num_threads} processes completed", end="\r", flush=True)
@@ -46,8 +46,8 @@ def run_cpu_stress_test(num_threads, duration):
     max_cpu_usage = max(cpu_usage)
 
     print("Performance Feedback:")
-    print(f"Average CPU Usage: {avg_cpu_usage}%")
-    print(f"Max CPU Usage: {max_cpu_usage}%")
+    print(f"Average CPU Usage: {avg_cpu_usage:.2f}%")
+    print(f"Max CPU Usage: {max_cpu_usage:.2f}%")
 
     # Additional feedback on CPU performance
     if avg_cpu_usage <= 50:
@@ -119,6 +119,7 @@ if __name__ == "__main__":
             duration = int(input("Enter the duration of the stress test (in seconds): "))
             run_cpu_stress_test(num_threads, duration)
         elif choice == 2:
+            cpu_info = get_cpu_info()  # Update CPU information
             display_cpu_info(cpu_info)
         elif choice == 3:
             print("Exiting the CPU Stress Testing Tool...")
